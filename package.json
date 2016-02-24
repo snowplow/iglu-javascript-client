@@ -1,0 +1,28 @@
+{
+  "name": "iglu-javascript-client",
+  "version": "0.0.0",
+  "description": "A javascript client for Iglu schema servers and Snowplow events",
+  "main": "src/iglu-client.js",
+  "scripts": {
+    "build": "browserify src/browser.js --standalone Iglu -o lib/iglu-client.js",
+    "lint": "eslint src/*.js"
+  },
+  "homepage": "https://github.com/snowplow/iglu-javascript-client",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/snowplow/iglu-javascript-client.git"
+  },
+  "bugs": {
+    "url": "https://github.com/snowplow/iglu-javascript-client/issues"
+  },
+  "devDependencies": {
+    "browserify": "*",
+    "eslint": "*",
+    "eslint-config-standard": "^5.1.0",
+    "eslint-plugin-promise": "^1.0.8",
+    "eslint-plugin-standard": "^1.3.2"
+  },
+  "dependencies": {
+    "is-my-json-valid": "*"
+  }
+}

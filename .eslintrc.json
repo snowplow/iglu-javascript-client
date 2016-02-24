@@ -1,0 +1,14 @@
+{
+    "extends": "standard",
+    "plugins": [
+        "standard"
+    ],
+    "rules": {
+      "semi": [0, "always"]
+    },
+    "ecmaVersion": 6,
+    "env": {
+      "browser": true,
+      "node": true
+    }
+}
