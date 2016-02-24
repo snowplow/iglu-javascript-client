@@ -31,6 +31,16 @@ client.validateObject(obj).then(
 
 NOTE: As currently formulated, this client is meant to be used in a ServiceWorker context. Refactoring is needed to separate parts of this system that rely on browser-based apis from those that don't.  Notably these are the mechanisms for actually fetching schemas from a remote host and caching those schemas locally.
 
+From within a browser you can do something like this:
+
+```html
+  <script src="/javascripts/service-workers/snowplow/snowplow-worker-client.js"></script>
+  <script src="/javascripts/service-workers/snowplow/init-snowplow-worker.js"></script>
+```
+
+See the `init-snowplow-worker.js` file in `examples/service-worker`.
+
+
 ## Architecture
 
 - The library is written using ES2015. No attempt has been made to make this compatible with previous versions of JS.
