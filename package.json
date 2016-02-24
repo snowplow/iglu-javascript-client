@@ -2,10 +2,14 @@
   "name": "iglu-javascript-client",
   "version": "0.0.0",
   "description": "A javascript client for Iglu schema servers and Snowplow events",
+  "licesnse": "See LICENSE-2.0.txt",
   "main": "src/iglu-client.js",
   "scripts": {
-    "build": "browserify src/browser.js --standalone Iglu -o lib/iglu-client.js",
-    "lint": "eslint src/*.js"
+    "build": "npm run lint && npm run build-iglu && npm run build-worker && npm run build-worker-client",
+    "build-iglu": "browserify src/iglu/browser.js --standalone Iglu -o lib/iglu-client.js",
+    "build-worker": "browserify src/service-worker/snowplow-worker.js --standalone SnowplowWorker -o lib/snowplow-worker.js",
+    "build-worker-client": "browserify src/service-worker/snowplow-worker-client.js --standalone SnowplowWorkerClient -o lib/snowplow-worker-client.js",
+    "lint": "eslint src/iglu/*.js src/service-worker/*.js"
   },
   "homepage": "https://github.com/snowplow/iglu-javascript-client",
   "repository": {
