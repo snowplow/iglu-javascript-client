@@ -14,7 +14,13 @@ class SnowplowWorkerClient {
       let registration = navigator.serviceWorker.register(options.workerPath, { scope: options.scope });
 
       registration.then(function (reg) {
-        resolve(new SnowplowWorkerClient(reg, navigator.serviceWorker, {}));
+        if (reg.active) {
+          resolve(new SnowplowWorkerClient(reg, navigator.serviceWorker, {}));
+        } else {
+          navigator.serviceWorker.oncontrollerchange = () => {
+            resolve(new SnowplowWorkerClient(reg, navigator.serviceWorker, {}));
+          }
+        }
       });
 
       registration.catch(function (err) {
