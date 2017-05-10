@@ -132,6 +132,9 @@ class SnowplowWorker extends EventEmitter {
     this.maxSucessBufferSize = 1000; // TODO: allow this to be unbounded by setting to -1
     this.succeesBuffer = [];
 
+    this.context.addEventListener('fetch', this._bindHandler(this._onFetch));
+    this.context.addEventListener('message', this._bindHandler(this._onMessage));
+
     this.attachHandlers();
 
     this.on('snowplow-validation-failure', this._addToErrorBufferOnError);
@@ -200,17 +203,15 @@ class SnowplowWorker extends EventEmitter {
 
   _onWorkerInstall (event) {
     console.log('Snowplow Worker Installed', event);
-    this.context.skipWaiting();
+    event.waitUntil(this.context.skipWaiting());
   }
 
   _onWorkerActivate (event) {
     console.log('Snowplow Worker Activated', event);
     event.waitUntil(cleanupCaches());
+    event.waitUntil(this.context.clients.claim());
     this.on('snowplow-validation-failure', NotifyErrors);
     this.on('snowplow-validation-success', NotifyValidations);
-
-    this.context.addEventListener('fetch', this._bindHandler(this._onFetch));
-    this.context.addEventListener('message', this._bindHandler(this._onMessage));
   }
 
   _onFetch (event) {
