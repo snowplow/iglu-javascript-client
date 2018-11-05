@@ -7,7 +7,7 @@ let SchemaMetadata = _Schema.SchemaMetadata;
 
 const SCHEMATIZED_FIELDS = {
   'ue': ['ue_px', 'ue_pr'], // Unstructured events base64, non-base64
-  '*': ['cx', 'co']         // Contexts: base64, nonbase64
+  '*': ['cx', 'co'] // Contexts: base64, nonbase64
 };
 
 const IGLU_RESOLVER_KEY = 'repositories';
@@ -129,9 +129,9 @@ class IgluClient {
     var myResolvers = this.resolvers;
     return new Promise(function (resolve, reject) {
       // Look for schema in cache and return.
-      if (false) {  // TODO
+      if (false) { // TODO
         return // CACHED VERSION
-      } else {  // Else, look up the schema
+      } else { // Else, look up the schema
         var schemaMetadata = SchemaMetadata.FromSchemaKey(key);
         // TODO: Could return null - handle error.
 
