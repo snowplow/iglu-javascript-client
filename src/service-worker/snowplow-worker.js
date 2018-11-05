@@ -49,14 +49,7 @@ class URLUtils {
     return URL.parse(str);
   }
 
-  static ParseQueryString (queryString, fieldsToDecode) {
-    let obj = {};
-    let vars = queryString.split('&');
-    for (let item of vars) {
-      let pair = item.split('=');
-      obj[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1]);
-    }
-
+  static decodeFields (obj, fieldsToDecode) {
     for (let field of fieldsToDecode) {
       if (obj[field] !== undefined) {
         let base64 = obj[field].replace(/-/g, '/');
@@ -65,7 +58,23 @@ class URLUtils {
     }
 
     return obj;
+  }
+
+  static ParseQueryString (queryString, fieldsToDecode) {
+    let obj = {};
+    let vars = queryString.split('&');
+    for (let item of vars) {
+      let pair = item.split('=');
+      obj[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1]);
+    }
+
+    return this.decodeFields(obj, fieldsToDecode);
   };
+
+  static ParseBody (request, fieldsToDecode) {
+    return request.json()
+      .then((body) => this.decodeFields(body.data[0], fieldsToDecode));
+  }
 }
 
 // URLUtils.ParseURI.options = { // Seems like the only way to do static values of a class?
@@ -101,7 +110,7 @@ const CONSTANTS = {
 
   SCHEMATIZED_FIELDS: {
     'ue': ['ue_px', 'ue_pr'], // Unstructured events base64, non-base64
-    '*': ['cx', 'co']         // Contexts: base64, nonbase64
+    '*': ['cx', 'co'] // Contexts: base64, nonbase64
   },
 
   ENCODED_FIELDS: ['cx', 'ue_px'],
@@ -117,7 +126,6 @@ const CURRENT_CACHES = {
 };
 
 class SnowplowWorker extends EventEmitter {
-
   constructor (context, igluClient) {
     super();
     this.context = context;
@@ -147,13 +155,19 @@ class SnowplowWorker extends EventEmitter {
   fetchHandler (request) {
     let parsedURL = URLUtils.ParseURI(request.url);
 
-    // TODO: Remove GET restriction once logic is in place to handle non-GET requests
-    if (this.collectorHosts.includes(parsedURL.host) && request.method === 'GET') {
-      this.validateRequest(request);
+    if (this.collectorHosts.includes(parsedURL.host) && request.method === 'POST') {
+      URLUtils.ParseBody(request, this.fieldsToDecode).then((payload) => {
+        this.validateRequest(payload);
+      }).catch((error) => {
+        console.warn('Request most likely does not contain JSON: ', error)
+      });
+    } else if (this.collectorHosts.includes(parsedURL.host) && request.method === 'GET') {
+      let payload = URLUtils.ParseQueryString(parsedURL.query, this.fieldsToDecode);
+      this.validateRequest(payload);
     }
   }
 
-  validateRequest (request) {
+  validateRequest (payload) {
     // Then look at fields that carry schematized data: cx, ue_px, etc
     //    - For each schematized field, first check if they are valid, self-describing
     //      items using 'com.snowplowanalytics.self-desc/instance-iglu-only/jsonschema/1-0-0'
@@ -161,8 +175,6 @@ class SnowplowWorker extends EventEmitter {
     //    - If there are multiple items within 'data', validate each
 
     let snowplow = this;
-    let parsedURL = URLUtils.ParseURI(request.url);
-    let payload = URLUtils.ParseQueryString(parsedURL.query, this.fieldsToDecode);
     if (payload.p && payload.p === CONSTANTS.WEB_PLATFORM) {
       let eventType = payload.e;
       let fieldsToValidate = IgluClient.GetSchematizedFieldNames(eventType);
@@ -216,13 +228,6 @@ class SnowplowWorker extends EventEmitter {
 
   _onFetch (event) {
     this.fetchHandler(event.request);
-
-    // TODO: This method assumes that fetchHandler does not read the body
-    //       of the request. This is ok, in the case of GET-based trackers
-    //       but wont work for other methods. Some logic is needed here to
-    //       conditionally clone requests if the given request is consumed.
-    // Return the original response object, which will be used to fulfill the resource request.
-    return fetch(event.request).then((response) => response);
   }
 
   _onMessage (event) {
