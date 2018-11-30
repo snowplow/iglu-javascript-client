@@ -137,7 +137,7 @@ class IgluClient {
 
         var resolver;
 
-        for (var i = 0; i < myResolvers.length; i++) {
+        for (let i = 0; i < myResolvers.length; i++) {
           if (myResolvers[i].resolves(schemaMetadata)) {
             resolver = myResolvers[i];
             break;

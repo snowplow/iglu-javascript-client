@@ -1,17 +1,28 @@
 'use strict';
 
-let Schema = require('./schema').Schema;
+const Schema = require('./schema').Schema;
 
 const IGLU_SCHEMA_PREFIX = 'iglu:';
 const IGLU_URI_PATH_PREFIX = 'schemas';
 
-class Resolver {
-  // cacheName = CURRENT_CACHES.snowplow
-  static ServiceWorkerCachingRetriever (cacheName, baseURI, key) {
-    let keyWithoutIgluPrefix = key.substring(IGLU_SCHEMA_PREFIX.length);
-    let url = [baseURI, IGLU_URI_PATH_PREFIX, keyWithoutIgluPrefix].join('/');
+if(!window) {
+  if(!caches) {
+   const CacheStorage = require('fetch-cachestorage/caches');
+   const cahes = new CacheStorage();
 
-    let request = new Request(url, {
+  }
+  if (!Request) {
+     const Request = require('node-fetch').Request;
+  }
+
+}
+
+class Resolver {
+  static ServiceWorkerCachingRetriever (cacheName, baseURI, key) {
+    const keyWithoutIgluPrefix = key.substring(IGLU_SCHEMA_PREFIX.length);
+    const url = [baseURI, IGLU_URI_PATH_PREFIX, keyWithoutIgluPrefix].join('/');
+
+    const request = new Request(url, {
       method: 'GET',
       mode: 'cors'
     });
