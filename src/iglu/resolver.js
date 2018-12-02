@@ -34,7 +34,7 @@ class Resolver {
     this.cacheConfig = config.cacheConfig || {};
 
     if(!config.cacheConfig || !config.cacheConfig.cacheName) {
-        this.cacheConfig = ('c_' + config.name).replace(/\s/g, '_');
+        this.cacheConfig.cacheName = ('c_' + config.name).replace(/\s/g, '_');
     }
 
     if (config.connection && config.connection.http) {
