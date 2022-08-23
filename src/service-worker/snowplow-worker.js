@@ -101,7 +101,7 @@ const CONSTANTS = {
 
   SCHEMATIZED_FIELDS: {
     'ue': ['ue_px', 'ue_pr'], // Unstructured events base64, non-base64
-    '*': ['cx', 'co']         // Contexts: base64, nonbase64
+    '*': ['cx', 'co'] // Contexts: base64, nonbase64
   },
 
   ENCODED_FIELDS: ['cx', 'ue_px'],
@@ -117,7 +117,6 @@ const CURRENT_CACHES = {
 };
 
 class SnowplowWorker extends EventEmitter {
-
   constructor (context, igluClient) {
     super();
     this.context = context;
