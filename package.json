@@ -1,6 +1,6 @@
 {
   "name": "iglu-javascript-client",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "A javascript client for Iglu schema servers and Snowplow events",
   "license": "Apache-2.0",
   "main": "src/iglu-client.js",
